@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +20,7 @@ fun ShoppingItemCard(
     item: ShoppingItem,
     onCheckedChange: (Boolean) -> Unit,
     onDelete: () -> Unit,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -81,6 +83,16 @@ fun ShoppingItemCard(
             }
             
             Spacer(modifier = Modifier.width(8.dp))
+            
+            IconButton(
+                onClick = onEdit
+            ) {
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = "Edit item",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
             
             IconButton(
                 onClick = onDelete

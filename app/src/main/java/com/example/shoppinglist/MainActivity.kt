@@ -4,10 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shoppinglist.data.DatabaseInitializer
 import com.example.shoppinglist.data.database.ShoppingDatabase
 import com.example.shoppinglist.data.repository.ShoppingRepository
+import com.example.shoppinglist.data.database.entities.ShoppingList
+import com.example.shoppinglist.ui.screens.ListSelectionScreen
 import com.example.shoppinglist.ui.screens.MainListScreen
 import com.example.shoppinglist.ui.theme.ShoppingListTheme
 import com.example.shoppinglist.viewmodel.ShoppingViewModel
@@ -33,17 +40,49 @@ class MainActivity : ComponentActivity() {
         setContent {
             ShoppingListTheme {
                 val viewModel: ShoppingViewModel = viewModel(factory = ShoppingViewModelFactory(repository))
+                var selectedList by remember { mutableStateOf<ShoppingList?>(null) }
+                
+                val shoppingLists by viewModel.allLists.collectAsStateWithLifecycle(initialValue = emptyList())
                 
                 // Initialize predefined items after UI is set up
                 LaunchedEffect(Unit) {
                     try {
                         DatabaseInitializer.populatePredefinedItems(database.predefinedItemDao())
+                        
+                        // Create default list if no lists exist
+                        if (shoppingLists.isEmpty()) {
+                            val defaultList = ShoppingList(name = "Shopping List")
+                            viewModel.insertList(defaultList)
+                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
                 }
                 
-                MainListScreen(viewModel = viewModel, listId = "default-list")
+                // Navigation logic
+                selectedList?.let { list ->
+                    MainListScreen(
+                        viewModel = viewModel, 
+                        listId = list.id,
+                        listName = list.name,
+                        onBackToLists = { selectedList = null }
+                    )
+                } ?: run {
+                    ListSelectionScreen(
+                        shoppingLists = shoppingLists,
+                        itemCounts = emptyMap(), // TODO: Calculate actual counts
+                        checkedCounts = emptyMap(), // TODO: Calculate actual counts
+                        onListSelected = { selectedList = it },
+                        onCreateNewList = { listName ->
+                            val newList = ShoppingList(name = listName)
+                            viewModel.insertList(newList)
+                            selectedList = newList
+                        },
+                        onDeleteList = { list ->
+                            viewModel.deleteList(list)
+                        }
+                    )
+                }
             }
         }
     }

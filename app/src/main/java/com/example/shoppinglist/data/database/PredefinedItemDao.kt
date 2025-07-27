@@ -1,6 +1,7 @@
 package com.example.shoppinglist.data.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -20,4 +21,10 @@ interface PredefinedItemDao {
 
     @Query("SELECT COUNT(*) FROM PredefinedItem")
     suspend fun getItemCount(): Int
+
+    @Delete
+    suspend fun deletePredefinedItem(item: PredefinedItem)
+
+    @Query("DELETE FROM PredefinedItem WHERE id = :itemId")
+    suspend fun deletePredefinedItemById(itemId: Int)
 }

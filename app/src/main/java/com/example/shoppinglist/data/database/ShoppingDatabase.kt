@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Database(
     entities = [ShoppingItem::class, ShoppingList::class, PredefinedItem::class], 
-    version = 2, 
+    version = 3, 
     exportSchema = false
 )
 abstract class ShoppingDatabase : RoomDatabase() {
@@ -27,7 +27,7 @@ abstract class ShoppingDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ShoppingDatabase::class.java,
-                    "shopping_database_v2"
+                    "shopping_database_v3"
                 )
                 .fallbackToDestructiveMigration()
                 .build()

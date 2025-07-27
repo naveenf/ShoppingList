@@ -23,7 +23,7 @@ fun ListSelectionScreen(
     itemCounts: Map<String, Int>,
     checkedCounts: Map<String, Int>,
     onListSelected: (ShoppingList) -> Unit,
-    onCreateNewList: () -> Unit,
+    onCreateNewList: (String) -> Unit,
     onDeleteList: (ShoppingList) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -97,7 +97,7 @@ fun ListSelectionScreen(
         CreateListDialog(
             onDismiss = { showCreateDialog = false },
             onConfirm = { listName ->
-                onCreateNewList()
+                onCreateNewList(listName)
                 showCreateDialog = false
             }
         )

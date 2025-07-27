@@ -86,4 +86,8 @@ class ShoppingRepository(
         )
         predefinedItemDao.insertPredefinedItems(listOf(newItem))
     }
+
+    suspend fun deletePredefinedItem(item: PredefinedItem) {
+        predefinedItemDao.deletePredefinedItem(item)
+    }
 }

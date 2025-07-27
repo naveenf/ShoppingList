@@ -76,6 +76,9 @@ object ShareUtils {
         val uncheckedItems = items.filter { !it.isChecked }
         val checkedItems = items.filter { it.isChecked }
         
+        // Find the longest item name across ALL items (both checked and unchecked) for perfect global alignment
+        val maxItemNameLength = items.maxOfOrNull { it.name.length } ?: 0
+        
         val builder = StringBuilder().apply {
             // Clean header
             appendLine("🛒 $listName")
@@ -87,9 +90,15 @@ object ShareUtils {
                 
                 uncheckedItems.groupBy { it.category }.forEach { (category, categoryItems) ->
                     appendLine("$category")
-                    categoryItems.forEach { item ->
-                        val quantityUnit = formatQuantityUnit(item.quantity, item.unit)
-                        appendLine("• ${item.name}$quantityUnit")
+                    appendLine("─".repeat(15)) // Fixed length dashes for consistency
+                    
+                    categoryItems.forEachIndexed { index, item ->
+                        val quantityUnit = formatQuantityUnitAligned(item.quantity, item.unit)
+                        val number = "${index + 1}.".padEnd(3) // "1. " or "10."
+                        
+                        // Position colon based ONLY on item name length, not including numbering
+                        val paddedName = String.format("%-${maxItemNameLength}s", item.name) // Pad item name to max length
+                        appendLine("$number$paddedName : $quantityUnit") // Number + padded name + colon + quantity
                     }
                     appendLine()
                 }
@@ -97,23 +106,38 @@ object ShareUtils {
             
             if (checkedItems.isNotEmpty()) {
                 appendLine("ALREADY HAVE:")
-                appendLine()
-                checkedItems.forEach { item ->
-                    val quantityUnit = formatQuantityUnit(item.quantity, item.unit)
-                    appendLine("✓ ${item.name}$quantityUnit")
+                appendLine("─".repeat(15)) // Fixed length dashes for consistency
+                
+                checkedItems.forEachIndexed { index, item ->
+                    val quantityUnit = formatQuantityUnitAligned(item.quantity, item.unit)
+                    val number = "${index + 1}.".padEnd(3)
+                    
+                    // Position colon based ONLY on item name length, not including numbering
+                    val paddedName = String.format("%-${maxItemNameLength}s", item.name) // Pad item name to max length
+                    appendLine("$number$paddedName : $quantityUnit ✓") // Number + padded name + colon + quantity
                 }
                 appendLine()
             }
             
             // Clean summary
-            if (uncheckedItems.isNotEmpty()) {
-                appendLine("${uncheckedItems.size} items remaining")
-            } else {
-                appendLine("Shopping complete! ✨")
-            }
+            val totalItems = items.size
+            appendLine("Total Items: $totalItems")
         }
         
         return builder.toString().trim()
+    }
+    
+    private fun formatQuantityUnitAligned(quantity: Float, unit: String): String {
+        return if (unit == "nos" && quantity == 1f) {
+            "1 nos"
+        } else {
+            val quantityStr = if (quantity % 1 == 0f) {
+                quantity.toInt().toString()
+            } else {
+                quantity.toString()
+            }
+            "$quantityStr $unit"
+        }
     }
     
     private fun formatQuantityUnit(quantity: Float, unit: String): String {

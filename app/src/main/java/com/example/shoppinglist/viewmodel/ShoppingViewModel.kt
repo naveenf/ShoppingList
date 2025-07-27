@@ -52,6 +52,10 @@ class ShoppingViewModel(private val repository: ShoppingRepository) : ViewModel(
         repository.addCustomPredefinedItem(name, category)
     }
 
+    fun deletePredefinedItem(item: PredefinedItem) = viewModelScope.launch {
+        repository.deletePredefinedItem(item)
+    }
+
     // Helper functions
     suspend fun getItemCountForList(listId: String): Int {
         return repository.getItemCountForList(listId)

@@ -1,12 +1,15 @@
 package com.example.shoppinglist.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
@@ -18,7 +21,7 @@ import androidx.compose.ui.window.Dialog
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AddItemDialog(
     onDismiss: () -> Unit,
@@ -26,6 +29,7 @@ fun AddItemDialog(
     listId: String,
     predefinedItems: List<PredefinedItem> = emptyList(),
     onAddCustomItem: (String, String) -> Unit = { _, _ -> },
+    onDeleteCustomItem: (PredefinedItem) -> Unit = { _ -> },
     modifier: Modifier = Modifier
 ) {
     var itemName by remember { mutableStateOf("") }
@@ -37,6 +41,7 @@ fun AddItemDialog(
     var unitExpanded by remember { mutableStateOf(false) }
     var showCustomForm by remember { mutableStateOf(false) }
     var selectedPredefinedItem by remember { mutableStateOf<PredefinedItem?>(null) }
+    var itemToDelete by remember { mutableStateOf<PredefinedItem?>(null) }
 
     val categories = listOf(
         "Produce", "Dairy & Eggs", "Bakery", "Meat & Seafood", 
@@ -112,7 +117,22 @@ fun AddItemDialog(
                                     items(filteredItems) { item ->
                                         ListItem(
                                             headlineContent = { Text(item.name) },
-                                            supportingContent = { Text("${item.category} • ${item.defaultUnit}") },
+                                            supportingContent = { 
+                                                Text("${item.category} • ${item.defaultUnit}${if (item.id >= 1000) " • Custom" else ""}") 
+                                            },
+                                            trailingContent = {
+                                                if (item.id >= 1000) { // Custom item
+                                                    IconButton(
+                                                        onClick = { itemToDelete = item }
+                                                    ) {
+                                                        Icon(
+                                                            Icons.Default.Delete,
+                                                            contentDescription = "Delete custom item",
+                                                            tint = MaterialTheme.colorScheme.error
+                                                        )
+                                                    }
+                                                }
+                                            },
                                             modifier = Modifier.clickable {
                                                 selectedPredefinedItem = item
                                             }
@@ -289,5 +309,29 @@ fun AddItemDialog(
                 }
             }
         }
+    }
+
+    // Delete confirmation dialog
+    itemToDelete?.let { item ->
+        AlertDialog(
+            onDismissRequest = { itemToDelete = null },
+            title = { Text("Delete Custom Item") },
+            text = { Text("Are you sure you want to delete \"${item.name}\"? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteCustomItem(item)
+                        itemToDelete = null
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { itemToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

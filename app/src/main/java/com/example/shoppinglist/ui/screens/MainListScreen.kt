@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 import com.example.shoppinglist.ui.components.AddItemDialog
 import com.example.shoppinglist.ui.components.CategoryHeader
+import com.example.shoppinglist.ui.components.EditItemDialog
 import com.example.shoppinglist.ui.components.EmptyState
 import com.example.shoppinglist.ui.components.ShoppingItemCard
 import com.example.shoppinglist.utils.ShareUtils
@@ -26,6 +28,8 @@ import com.example.shoppinglist.viewmodel.ShoppingViewModel
 fun MainListScreen(
     viewModel: ShoppingViewModel,
     listId: String,
+    listName: String,
+    onBackToLists: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -33,6 +37,7 @@ fun MainListScreen(
     val predefinedItems by viewModel.allPredefinedItems.collectAsStateWithLifecycle(initialValue = emptyList())
     var showAddDialog by remember { mutableStateOf(false) }
     var showShareMenu by remember { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
 
     // Group items by category
     val groupedItems = items.groupBy { it.category }
@@ -40,7 +45,15 @@ fun MainListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shopping List") },
+                title = { Text(listName) },
+                navigationIcon = {
+                    IconButton(onClick = onBackToLists) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back to lists"
+                        )
+                    }
+                },
                 actions = {
                     if (items.isNotEmpty()) {
                         Box {
@@ -63,21 +76,21 @@ fun MainListScreen(
                                         )
                                     },
                                     onClick = {
-                                        ShareUtils.shareShoppingList(context, "Shopping List", items)
+                                        ShareUtils.shareShoppingList(context, listName, items)
                                         showShareMenu = false
                                     }
                                 )
                                 DropdownMenuItem(
                                     text = { Text("Share via WhatsApp") },
                                     onClick = {
-                                        ShareUtils.shareToWhatsApp(context, "Shopping List", items)
+                                        ShareUtils.shareToWhatsApp(context, listName, items)
                                         showShareMenu = false
                                     }
                                 )
                                 DropdownMenuItem(
                                     text = { Text("Share via SMS") },
                                     onClick = {
-                                        ShareUtils.shareViaSMS(context, "Shopping List", items)
+                                        ShareUtils.shareViaSMS(context, listName, items)
                                         showShareMenu = false
                                     }
                                 )
@@ -135,6 +148,9 @@ fun MainListScreen(
                             onDelete = {
                                 viewModel.delete(item)
                             },
+                            onEdit = {
+                                editingItem = item
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 2.dp)
@@ -160,6 +176,20 @@ fun MainListScreen(
             predefinedItems = predefinedItems,
             onAddCustomItem = { name, category ->
                 viewModel.addCustomPredefinedItem(name, category)
+            },
+            onDeleteCustomItem = { item ->
+                viewModel.deletePredefinedItem(item)
+            }
+        )
+    }
+
+    editingItem?.let { item ->
+        EditItemDialog(
+            item = item,
+            onDismiss = { editingItem = null },
+            onSave = { updatedItem ->
+                viewModel.update(updatedItem)
+                editingItem = null
             }
         )
     }
