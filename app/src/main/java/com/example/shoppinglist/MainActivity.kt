@@ -7,10 +7,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shoppinglist.data.DatabaseInitializer
+import com.example.shoppinglist.data.PremiumManager
 import com.example.shoppinglist.data.database.ShoppingDatabase
 import com.example.shoppinglist.data.repository.ShoppingRepository
 import com.example.shoppinglist.data.database.entities.ShoppingList
@@ -21,6 +23,7 @@ import com.example.shoppinglist.viewmodel.ShoppingViewModel
 import com.example.shoppinglist.viewmodel.ShoppingViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     
@@ -30,8 +33,12 @@ class MainActivity : ComponentActivity() {
         ShoppingDatabase.getDatabase(applicationContext, applicationScope)
     }
     
+    private val premiumManager by lazy {
+        PremiumManager(applicationContext)
+    }
+    
     private val repository by lazy {
-        ShoppingRepository(database.itemDao(), database.predefinedItemDao())
+        ShoppingRepository(database.itemDao(), database.predefinedItemDao(), database.templateDao(), premiumManager)
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,11 +50,14 @@ class MainActivity : ComponentActivity() {
                 var selectedList by remember { mutableStateOf<ShoppingList?>(null) }
                 
                 val shoppingLists by viewModel.allLists.collectAsStateWithLifecycle(initialValue = emptyList())
+                val templates by viewModel.allTemplates.collectAsStateWithLifecycle(initialValue = emptyList())
+                val isPremium by premiumManager.isPremium.collectAsStateWithLifecycle(initialValue = false)
                 
                 // Initialize predefined items after UI is set up
                 LaunchedEffect(Unit) {
                     try {
                         DatabaseInitializer.populatePredefinedItems(database.predefinedItemDao())
+                        DatabaseInitializer.populateTemplates(database.templateDao())
                         
                         // Create default list if no lists exist
                         if (shoppingLists.isEmpty()) {
@@ -72,14 +82,26 @@ class MainActivity : ComponentActivity() {
                         shoppingLists = shoppingLists,
                         itemCounts = emptyMap(), // TODO: Calculate actual counts
                         checkedCounts = emptyMap(), // TODO: Calculate actual counts
+                        templates = templates,
+                        isPremium = isPremium,
                         onListSelected = { selectedList = it },
                         onCreateNewList = { listName ->
                             val newList = ShoppingList(name = listName)
                             viewModel.insertList(newList)
                             selectedList = newList
                         },
+                        onCreateFromTemplate = { template, listName ->
+                            viewModel.createListFromTemplate(template, listName)
+                        },
                         onDeleteList = { list ->
                             viewModel.deleteList(list)
+                        },
+                        onUpgradeToPremium = {
+                            // For demo purposes, just enable premium
+                            // In a real app, this would open a payment flow
+                            applicationScope.launch {
+                                premiumManager.setPremiumStatus(true)
+                            }
                         }
                     )
                 }

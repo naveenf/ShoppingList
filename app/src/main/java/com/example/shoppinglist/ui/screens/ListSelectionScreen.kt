@@ -6,12 +6,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.ShoppingList
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,9 +24,13 @@ fun ListSelectionScreen(
     shoppingLists: List<ShoppingList>,
     itemCounts: Map<String, Int>,
     checkedCounts: Map<String, Int>,
+    templates: List<ListTemplate>,
+    isPremium: Boolean = false,
     onListSelected: (ShoppingList) -> Unit,
     onCreateNewList: (String) -> Unit,
+    onCreateFromTemplate: (ListTemplate, String) -> Unit,
     onDeleteList: (ShoppingList) -> Unit,
+    onUpgradeToPremium: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -95,11 +101,18 @@ fun ListSelectionScreen(
     
     if (showCreateDialog) {
         CreateListDialog(
+            templates = templates,
+            isPremium = isPremium,
             onDismiss = { showCreateDialog = false },
             onConfirm = { listName ->
                 onCreateNewList(listName)
                 showCreateDialog = false
-            }
+            },
+            onCreateFromTemplate = { template, listName ->
+                onCreateFromTemplate(template, listName)
+                showCreateDialog = false
+            },
+            onUpgradeToPremium = onUpgradeToPremium
         )
     }
     
@@ -197,27 +210,92 @@ private fun ShoppingListCard(
 
 @Composable
 private fun CreateListDialog(
+    templates: List<ListTemplate>,
+    isPremium: Boolean,
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (String) -> Unit,
+    onCreateFromTemplate: (ListTemplate, String) -> Unit,
+    onUpgradeToPremium: () -> Unit
 ) {
     var listName by remember { mutableStateOf("") }
+    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTemplate by remember { mutableStateOf<ListTemplate?>(null) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Create New List") },
         text = {
-            OutlinedTextField(
-                value = listName,
-                onValueChange = { listName = it },
-                label = { Text("List name") },
-                placeholder = { Text("e.g., Weekly Groceries") },
-                singleLine = true
-            )
+            Column {
+                TabRow(selectedTabIndex = selectedTab) {
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0; selectedTemplate = null },
+                        text = { Text("Empty List") }
+                    )
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        text = { Text("From Template") }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                OutlinedTextField(
+                    value = listName,
+                    onValueChange = { listName = it },
+                    label = { Text("List name") },
+                    placeholder = { 
+                        Text(if (selectedTemplate != null) selectedTemplate!!.name else "e.g., Weekly Groceries") 
+                    },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                if (selectedTab == 1) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Choose a template:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    LazyColumn(
+                        modifier = Modifier.height(200.dp)
+                    ) {
+                        items(templates) { template ->
+                            TemplateCard(
+                                template = template,
+                                isSelected = selectedTemplate == template,
+                                isPremium = isPremium,
+                                onClick = { 
+                                    if (template.isPremium && !isPremium) {
+                                        onUpgradeToPremium()
+                                    } else {
+                                        selectedTemplate = template
+                                        if (listName.isBlank()) {
+                                            listName = template.name
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         },
         confirmButton = {
             TextButton(
-                onClick = { onConfirm(listName) },
-                enabled = listName.isNotBlank()
+                onClick = { 
+                    if (selectedTab == 0) {
+                        onConfirm(listName)
+                    } else {
+                        selectedTemplate?.let { template ->
+                            onCreateFromTemplate(template, listName)
+                        }
+                    }
+                },
+                enabled = listName.isNotBlank() && (selectedTab == 0 || selectedTemplate != null)
             ) {
                 Text("Create")
             }
@@ -228,4 +306,70 @@ private fun CreateListDialog(
             }
         }
     )
+}
+
+@Composable
+private fun TemplateCard(
+    template: ListTemplate,
+    isSelected: Boolean,
+    isPremium: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = when {
+                isSelected -> MaterialTheme.colorScheme.primaryContainer
+                template.isPremium && !isPremium -> MaterialTheme.colorScheme.surfaceVariant
+                else -> MaterialTheme.colorScheme.surface
+            }
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = template.icon ?: "📋",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(end = 12.dp)
+            )
+            
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = template.name,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    if (template.isPremium) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "Premium",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .padding(start = 4.dp)
+                        )
+                    }
+                }
+                Text(
+                    text = template.description + if (template.estimatedPeople != null) " (${template.estimatedPeople} people)" else "",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${template.items.size} items",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+    }
 }

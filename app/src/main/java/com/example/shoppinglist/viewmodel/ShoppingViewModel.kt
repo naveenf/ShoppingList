@@ -2,6 +2,7 @@ package com.example.shoppinglist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 import com.example.shoppinglist.data.database.entities.ShoppingList
@@ -63,5 +64,21 @@ class ShoppingViewModel(private val repository: ShoppingRepository) : ViewModel(
 
     suspend fun getCheckedItemCountForList(listId: String): Int {
         return repository.getCheckedItemCountForList(listId)
+    }
+
+    // Templates
+    val allTemplates: Flow<List<ListTemplate>> = repository.getAllTemplates()
+    val freeTemplates: Flow<List<ListTemplate>> = repository.getFreeTemplates()
+
+    fun getTemplatesByCategory(category: String): Flow<List<ListTemplate>> {
+        return repository.getTemplatesByCategory(category)
+    }
+
+    fun createListFromTemplate(template: ListTemplate, listName: String) = viewModelScope.launch {
+        repository.createListFromTemplate(template, listName)
+    }
+
+    suspend fun getTemplateById(id: String): ListTemplate? {
+        return repository.getTemplateById(id)
     }
 }

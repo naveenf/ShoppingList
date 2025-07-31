@@ -1,15 +1,21 @@
 package com.example.shoppinglist.data.repository
 
+import com.example.shoppinglist.data.PremiumManager
 import com.example.shoppinglist.data.database.ItemDao
 import com.example.shoppinglist.data.database.PredefinedItemDao
+import com.example.shoppinglist.data.database.TemplateDao
+import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 import com.example.shoppinglist.data.database.entities.ShoppingList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
 class ShoppingRepository(
     private val itemDao: ItemDao,
-    private val predefinedItemDao: PredefinedItemDao
+    private val predefinedItemDao: PredefinedItemDao,
+    private val templateDao: TemplateDao,
+    private val premiumManager: PremiumManager
 ) {
     // Shopping Items
     fun getItemsByList(listId: String): Flow<List<ShoppingItem>> = itemDao.getItemsByList(listId)
@@ -89,5 +95,59 @@ class ShoppingRepository(
 
     suspend fun deletePredefinedItem(item: PredefinedItem) {
         predefinedItemDao.deletePredefinedItem(item)
+    }
+
+    // Templates
+    fun getAllTemplates(): Flow<List<ListTemplate>> {
+        return combine(
+            templateDao.getAllTemplates(),
+            premiumManager.isPremium
+        ) { templates, isPremium ->
+            if (isPremium) {
+                templates
+            } else {
+                templates.filter { !it.isPremium }
+            }
+        }
+    }
+
+    fun getFreeTemplates(): Flow<List<ListTemplate>> {
+        return templateDao.getFreeTemplates()
+    }
+
+    fun getTemplatesByCategory(category: String): Flow<List<ListTemplate>> {
+        return templateDao.getTemplatesByCategory(category)
+    }
+
+    suspend fun getTemplateById(id: String): ListTemplate? {
+        return templateDao.getTemplateById(id)
+    }
+
+    suspend fun insertTemplates(templates: List<ListTemplate>) {
+        templateDao.insertTemplates(templates)
+    }
+
+    suspend fun createListFromTemplate(template: ListTemplate, listName: String): String {
+        // Create new shopping list
+        val newList = ShoppingList(
+            name = listName,
+            createdDate = System.currentTimeMillis()
+        )
+        insertList(newList)
+
+        // Add all template items to the new list
+        template.items.forEach { templateItem ->
+            val shoppingItem = ShoppingItem(
+                listId = newList.id,
+                name = templateItem.name,
+                quantity = templateItem.quantity,
+                unit = templateItem.unit,
+                category = templateItem.category,
+                notes = templateItem.notes
+            )
+            insert(shoppingItem)
+        }
+
+        return newList.id
     }
 }

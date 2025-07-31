@@ -1,6 +1,7 @@
 package com.example.shoppinglist.data
 
 import com.example.shoppinglist.data.database.PredefinedItemDao
+import com.example.shoppinglist.data.database.TemplateDao
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 
 object DatabaseInitializer {
@@ -67,5 +68,13 @@ object DatabaseInitializer {
         )
         
         predefinedItemDao.insertPredefinedItems(predefinedItems)
+    }
+    
+    suspend fun populateTemplates(templateDao: TemplateDao) {
+        // Check if already populated
+        if (templateDao.getTemplateCount() > 0) return
+        
+        val templates = TemplateDataProvider.getPredefinedTemplates()
+        templateDao.insertTemplates(templates)
     }
 }
