@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,6 +32,7 @@ fun ListSelectionScreen(
     onCreateFromTemplate: (ListTemplate, String) -> Unit,
     onDeleteList: (ShoppingList) -> Unit,
     onUpgradeToPremium: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -40,7 +42,12 @@ fun ListSelectionScreen(
         modifier = modifier.fillMaxSize()
     ) {
         TopAppBar(
-            title = { Text("My Shopping Lists") }
+            title = { Text("My Shopping Lists") },
+            actions = {
+                IconButton(onClick = onSettingsClick) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
+            }
         )
         
         if (shoppingLists.isEmpty()) {

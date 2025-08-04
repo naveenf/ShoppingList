@@ -47,9 +47,42 @@ Create a modern, elegant Android shopping list app with a focus on simplicity, u
   - By recently added
   - By store layout (future feature)
 
-### 4. Visual Design
+### 4. Visual Design & Theming System
 
-#### Color Scheme (Huemint 3-Color Brand Palette)
+#### Multi-Theme Support
+The app now supports multiple visual themes to cater to different user preferences:
+
+1. **Modern Light Theme**: Clean, minimal design with the original Huemint color palette
+2. **Modern Dark Theme**: Dark mode version for low-light usage
+3. **Paper Notebook Theme**: Nostalgic handwritten journal experience
+
+#### Paper Notebook Theme
+A unique, handwritten notebook aesthetic that makes shopping lists feel personal and nostalgic:
+
+**Visual Elements:**
+- **Background**: Aged paper yellow/cream (#FFF8DC) mimicking old notebook paper
+- **Dotted Lines**: Horizontal guidelines at 40dp intervals for authentic notebook feel
+- **Margin Line**: Left red margin line at 60dp like school notebooks
+- **Typography**: Cursive fonts with increased letter spacing for handwritten feel
+- **Ink Colors**: 
+  - Dark gray (#2F2F2F) for regular text (pencil/pen)
+  - Dark blue (#1E1E8B) for headers and checkmarks (blue ink)
+- **Paper Aging**: Subtle random dots to simulate paper texture and aging
+
+**Paper Theme Colors:**
+```kotlin
+// Paper Theme - Vintage Notebook Style
+val PaperPrimary = Color(0xFF8B4513)        // Saddle Brown - for important elements
+val PaperBackground = Color(0xFFFFF8DC)     // Aged paper yellow/cream
+val PaperOnBackground = Color(0xFF2F2F2F)   // Dark gray ink
+val PaperSurface = Color(0xFFFFFAF0)        // Slightly whiter paper for cards
+val PaperLineColor = Color(0xFFE6E6FA)      // Light lavender for dotted lines
+val PaperMarginColor = Color(0xFFFFB6C1)    // Light pink for margin line
+val PaperInkBlue = Color(0xFF1E1E8B)        // Dark blue ink
+val PaperInkBlack = Color(0xFF2F2F2F)       // Soft black ink
+```
+
+#### Color Scheme (Huemint 3-Color Brand Palette - Modern Themes)
 ```kotlin
 // Material Design 3 Color Palette with Huemint Colors
 // This sophisticated palette combines dark navy, warm gold, forest green, and soft off-white
@@ -271,22 +304,82 @@ data class ShoppingList(
 - Recent items section for quick re-add
 
 #### Settings Screen
-- Theme toggle (Light/Dark/System)
+- Theme selection (Modern Light/Dark, Paper Notebook)
+- Premium status toggle
 - Default units preference
 - Categories management
 - Clear history option
 - About section
 
-### 8. Advanced Features (Phase 2)
+### 8. Premium Features & Smart Templates
 
-- **Multiple Lists**: Work, Home, Party shopping lists
+#### Premium Tier System
+- **Free Tier**: Basic shopping list functionality with 1 free template
+- **Premium Tier**: Unlimited lists, advanced smart templates, and premium features
+- **Premium Manager**: DataStore-based premium status management with persistent storage
+
+#### Smart Templates System
+Pre-filled shopping lists for common scenarios with one-tap creation:
+
+**Free Templates (1):**
+- 🛒 **Weekly Essentials**: Basic weekly grocery items (milk, bread, eggs, bananas, apples, rice, chicken)
+
+**Premium Templates (6):**
+- 🔥 **BBQ Party (15 people)**: Complete BBQ setup with burger patties, hot dogs, buns, condiments, charcoal, drinks, and party supplies
+- 🦃 **Thanksgiving Dinner**: Traditional feast ingredients for 8 people including turkey, sides, and dessert components
+- 👶 **Baby Essentials**: Must-have baby care items including diapers, formula, wipes, and feeding supplies
+- 🥑 **Keto Shopping**: Low-carb, high-fat diet essentials with avocados, salmon, eggs, cheese, and healthy fats
+- 🏕️ **Camping Trip**: Outdoor adventure supplies for 4 people with non-perishables, s'mores ingredients, and camping necessities
+- ⚡ **Quick Dinners Week**: 7 days of 30-minute meal ingredients including pasta, proteins, and versatile vegetables
+
+#### Template Features
+- **Smart Quantities**: Pre-calculated amounts based on serving sizes
+- **Category Organization**: Items automatically grouped by store sections
+- **Customizable**: Edit quantities, add/remove items after template creation
+- **People Estimation**: Templates specify serving sizes (e.g., "15 people", "8 people")
+- **Icon System**: Visual emoji identifiers for quick template recognition
+
+#### Template Data Structure
+```kotlin
+@Entity
+data class ListTemplate(
+    @PrimaryKey val id: String,
+    val name: String,
+    val description: String,
+    val category: String, // "Party", "Weekly", "Diet", "Holiday", "Family", "Travel", "Meal Prep"
+    val isPremium: Boolean = false,
+    val estimatedPeople: Int? = null,
+    val icon: String? = null, // Unicode emoji
+    val items: List<TemplateItem>
+)
+
+data class TemplateItem(
+    val name: String,
+    val quantity: Float = 1f,
+    val unit: String = "nos",
+    val category: String,
+    val notes: String? = null
+)
+```
+
+#### Premium UI Elements
+- **Template Gallery**: Grid view showing all available templates with premium badges
+- **Premium Lock**: Visual indicators for locked premium templates
+- **Upgrade Flow**: Seamless premium subscription process
+- **Template Preview**: Show template contents before creation
+
+### 9. Advanced Features (Phase 2)
+
+- **Multiple Lists**: Work, Home, Party shopping lists ✅ *Implemented*
+- **Smart Templates**: Pre-filled lists for common scenarios ✅ *Implemented*
+- **Premium Tier**: Advanced features with subscription model ✅ *Implemented*
 - **Share Lists**: Generate shareable link or QR code
 - **Price Tracking**: Add prices, see total estimate
 - **Store Mode**: Reorder items by store layout
 - **Recipes Integration**: Import ingredients from recipes
 - **Widget**: Home screen widget for quick view/add
 
-### 9. Technical Requirements
+### 10. Technical Requirements
 
 #### Minimum SDK
 - minSdk: 24 (Android 7.0)
@@ -313,23 +406,26 @@ kapt 'androidx.room:room-compiler:latest'
 
 // Navigation
 implementation 'androidx.navigation:navigation-compose:latest'
+
+// DataStore for Premium Management
+implementation 'androidx.datastore:datastore-preferences:latest'
 ```
 
-### 10. Accessibility
+### 11. Accessibility
 - Content descriptions for all icons
 - Minimum touch target: 48dp
 - High contrast mode support
 - Screen reader optimization
 - Keyboard navigation support
 
-### 11. Performance Goals
+### 12. Performance Goals
 - App launch: < 2 seconds
 - List scrolling: 60 FPS
 - Add item: < 500ms response
 - Database operations: Background thread
 - APK size: < 10MB
 
-### 12. Testing Requirements
+### 13. Testing Requirements
 - Unit tests for ViewModels
 - Integration tests for database
 - UI tests for critical user flows
@@ -342,22 +438,34 @@ app/src/main/java/com/yourname/shoppinglist/
 │   ├── database/
 │   │   ├── ShoppingDatabase.kt
 │   │   ├── ItemDao.kt
+│   │   ├── TemplateDao.kt
+│   │   ├── Converters.kt
 │   │   └── entities/
-│   └── repository/
-│       └── ShoppingRepository.kt
+│   │       ├── ShoppingItem.kt
+│   │       ├── ShoppingList.kt
+│   │       └── ListTemplate.kt
+│   ├── repository/
+│   │   └── ShoppingRepository.kt
+│   ├── PremiumManager.kt
+│   ├── ThemeManager.kt
+│   ├── TemplateDataProvider.kt
+│   └── DatabaseInitializer.kt
 ├── ui/
 │   ├── screens/
 │   │   ├── MainListScreen.kt
+│   │   ├── ListSelectionScreen.kt
 │   │   ├── AddItemScreen.kt
 │   │   └── SettingsScreen.kt
 │   ├── components/
 │   │   ├── ShoppingItemCard.kt
+│   │   ├── PaperShoppingItem.kt
 │   │   ├── CategoryHeader.kt
 │   │   └── EmptyState.kt
 │   └── theme/
 │       ├── Color.kt
 │       ├── Theme.kt
-│       └── Type.kt
+│       ├── Type.kt
+│       └── PaperBackground.kt
 ├── viewmodel/
 │   └── ShoppingViewModel.kt
 └── MainActivity.kt
@@ -371,10 +479,10 @@ app/src/main/java/com/yourname/shoppinglist/
 - < 2MB storage usage for 100 items
 
 ## Development Phases
-1. **Phase 1 (MVP)**: Core features - add, edit, delete, check items
-2. **Phase 2**: Categories, search, dark mode
-3. **Phase 3**: Multiple lists, sharing
-4. **Phase 4**: Advanced features (prices, barcode, widgets)
+1. **Phase 1 (MVP)**: Core features - add, edit, delete, check items ✅ *Completed*
+2. **Phase 2**: Categories, search, dark mode ✅ *Completed*
+3. **Phase 3**: Multiple lists, smart templates, premium tier ✅ *Completed*
+4. **Phase 4**: Advanced features (prices, barcode, widgets, sharing)
 
 ## Design Inspiration
 - Google Keep (simplicity)

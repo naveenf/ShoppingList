@@ -13,11 +13,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shoppinglist.data.DatabaseInitializer
 import com.example.shoppinglist.data.PremiumManager
+import com.example.shoppinglist.data.ThemeManager
 import com.example.shoppinglist.data.database.ShoppingDatabase
 import com.example.shoppinglist.data.repository.ShoppingRepository
 import com.example.shoppinglist.data.database.entities.ShoppingList
 import com.example.shoppinglist.ui.screens.ListSelectionScreen
 import com.example.shoppinglist.ui.screens.MainListScreen
+import com.example.shoppinglist.ui.screens.SettingsScreen
+import com.example.shoppinglist.ui.theme.AppTheme
 import com.example.shoppinglist.ui.theme.ShoppingListTheme
 import com.example.shoppinglist.viewmodel.ShoppingViewModel
 import com.example.shoppinglist.viewmodel.ShoppingViewModelFactory
@@ -37,6 +40,10 @@ class MainActivity : ComponentActivity() {
         PremiumManager(applicationContext)
     }
     
+    private val themeManager by lazy {
+        ThemeManager(applicationContext)
+    }
+    
     private val repository by lazy {
         ShoppingRepository(database.itemDao(), database.predefinedItemDao(), database.templateDao(), premiumManager)
     }
@@ -45,9 +52,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         setContent {
-            ShoppingListTheme {
+            val selectedTheme by themeManager.selectedTheme.collectAsStateWithLifecycle(initialValue = AppTheme.MODERN_LIGHT)
+            
+            ShoppingListTheme(theme = selectedTheme) {
                 val viewModel: ShoppingViewModel = viewModel(factory = ShoppingViewModelFactory(repository))
                 var selectedList by remember { mutableStateOf<ShoppingList?>(null) }
+                var showSettings by remember { mutableStateOf(false) }
                 
                 val shoppingLists by viewModel.allLists.collectAsStateWithLifecycle(initialValue = emptyList())
                 val templates by viewModel.allTemplates.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -70,14 +80,33 @@ class MainActivity : ComponentActivity() {
                 }
                 
                 // Navigation logic
-                selectedList?.let { list ->
-                    MainListScreen(
-                        viewModel = viewModel, 
-                        listId = list.id,
-                        listName = list.name,
-                        onBackToLists = { selectedList = null }
-                    )
-                } ?: run {
+                when {
+                    showSettings -> {
+                        SettingsScreen(
+                            isPremium = isPremium,
+                            onPremiumToggle = { premium ->
+                                applicationScope.launch {
+                                    premiumManager.setPremiumStatus(premium)
+                                }
+                            },
+                            selectedTheme = selectedTheme,
+                            onThemeChange = { theme ->
+                                applicationScope.launch {
+                                    themeManager.setTheme(theme)
+                                }
+                            },
+                            onBackClick = { showSettings = false }
+                        )
+                    }
+                    selectedList != null -> {
+                        MainListScreen(
+                            viewModel = viewModel, 
+                            listId = selectedList!!.id,
+                            listName = selectedList!!.name,
+                            onBackToLists = { selectedList = null }
+                        )
+                    }
+                    else -> {
                     ListSelectionScreen(
                         shoppingLists = shoppingLists,
                         itemCounts = emptyMap(), // TODO: Calculate actual counts
@@ -102,8 +131,10 @@ class MainActivity : ComponentActivity() {
                             applicationScope.launch {
                                 premiumManager.setPremiumStatus(true)
                             }
-                        }
+                        },
+                        onSettingsClick = { showSettings = true }
                     )
+                    }
                 }
             }
         }
