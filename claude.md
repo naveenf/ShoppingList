@@ -319,25 +319,28 @@ data class ShoppingList(
 - **Premium Manager**: DataStore-based premium status management with persistent storage
 
 #### Smart Templates System
-Pre-filled shopping lists for common scenarios with one-tap creation:
+Pre-filled shopping lists designed with the **80/20 rule** - each template covers 80% of what most people need for that scenario, reducing planning time while allowing for 20% customization based on individual preferences.
 
 **Free Templates (1):**
-- 🛒 **Weekly Essentials**: Basic weekly grocery items (milk, bread, eggs, bananas, apples, rice, chicken)
+- 🛒 **Weekly Essentials** (30 items): Comprehensive weekly groceries covering all basics - dairy, produce, proteins, carbs, cooking essentials, and household items. Covers 80% of what families buy weekly.
 
 **Premium Templates (6):**
-- 🔥 **BBQ Party (15 people)**: Complete BBQ setup with burger patties, hot dogs, buns, condiments, charcoal, drinks, and party supplies
-- 🦃 **Thanksgiving Dinner**: Traditional feast ingredients for 8 people including turkey, sides, and dessert components
-- 👶 **Baby Essentials**: Must-have baby care items including diapers, formula, wipes, and feeding supplies
-- 🥑 **Keto Shopping**: Low-carb, high-fat diet essentials with avocados, salmon, eggs, cheese, and healthy fats
-- 🏕️ **Camping Trip**: Outdoor adventure supplies for 4 people with non-perishables, s'mores ingredients, and camping necessities
-- ⚡ **Quick Dinners Week**: 7 days of 30-minute meal ingredients including pasta, proteins, and versatile vegetables
+- ⚡ **Quick Dinners Week** (22 items): Everything for 7 easy 30-minute meals with versatile proteins, quick carbs, essential vegetables, and cooking sauces
+- 🔥 **BBQ Party (10-15 people)** (22 items): Complete BBQ setup with multiple proteins, buns, toppings, sauces, drinks, and party supplies  
+- 🦃 **Thanksgiving Dinner (8-10 people)** (20 items): Traditional feast essentials including turkey, popular sides, cooking ingredients, desserts, and party supplies
+- 👶 **Baby Essentials** (12 items): Core baby care items for new parents
+- 🥑 **Keto Shopping** (12 items): Low-carb, high-fat diet staples and essentials
+- 🏕️ **Camping Trip** (14 items): Outdoor adventure supplies with practical non-perishables
 
 #### Template Features
-- **Smart Quantities**: Pre-calculated amounts based on serving sizes
-- **Category Organization**: Items automatically grouped by store sections
-- **Customizable**: Edit quantities, add/remove items after template creation
-- **People Estimation**: Templates specify serving sizes (e.g., "15 people", "8 people")
+- **80/20 Coverage**: Each template covers 80% of typical needs for that scenario
+- **Smart Quantities**: Pre-calculated realistic amounts based on serving sizes and usage patterns
+- **Category Organization**: Items automatically grouped by store sections for efficient shopping
+- **One-Tap Creation**: Instant shopping list creation with comprehensive pre-filled items
+- **Post-Creation Editing**: Full ability to add, remove, or modify items after list creation
+- **People Estimation**: Templates specify serving sizes (e.g., "10-15 people", "8-10 people")
 - **Icon System**: Visual emoji identifiers for quick template recognition
+- **Usage-Based Prioritization**: Most common templates (Weekly, Quick Dinners) have more comprehensive item lists
 
 #### Template Data Structure
 ```kotlin

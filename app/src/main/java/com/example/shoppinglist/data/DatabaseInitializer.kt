@@ -71,9 +71,8 @@ object DatabaseInitializer {
     }
     
     suspend fun populateTemplates(templateDao: TemplateDao) {
-        // Check if already populated
-        if (templateDao.getTemplateCount() > 0) return
-        
+        // Always update templates to ensure we have the latest comprehensive versions
+        // Using REPLACE strategy in DAO to update existing templates
         val templates = TemplateDataProvider.getPredefinedTemplates()
         templateDao.insertTemplates(templates)
     }
