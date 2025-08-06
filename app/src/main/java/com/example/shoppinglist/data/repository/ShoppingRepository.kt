@@ -2,19 +2,23 @@ package com.example.shoppinglist.data.repository
 
 import com.example.shoppinglist.data.PremiumManager
 import com.example.shoppinglist.data.database.ItemDao
+import com.example.shoppinglist.data.database.ItemPatternDao
 import com.example.shoppinglist.data.database.PredefinedItemDao
 import com.example.shoppinglist.data.database.TemplateDao
+import com.example.shoppinglist.data.database.entities.ItemPattern
 import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 import com.example.shoppinglist.data.database.entities.ShoppingList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 
 class ShoppingRepository(
     private val itemDao: ItemDao,
     private val predefinedItemDao: PredefinedItemDao,
     private val templateDao: TemplateDao,
+    private val itemPatternDao: ItemPatternDao,
     private val premiumManager: PremiumManager
 ) {
     // Shopping Items
@@ -23,6 +27,8 @@ class ShoppingRepository(
 
     suspend fun insert(item: ShoppingItem) {
         itemDao.insert(item)
+        // Learn from user's complete item details
+        learnFromUser(item.name, item.category, item.quantity, item.unit)
     }
 
     suspend fun update(item: ShoppingItem) {
@@ -149,5 +155,106 @@ class ShoppingRepository(
         }
 
         return newList.id
+    }
+
+    // Item Pattern Learning
+    suspend fun learnFromUser(itemName: String, category: String, quantity: Float = 1f, unit: String = "nos") {
+        val normalizedName = itemName.lowercase().trim()
+        val existing = itemPatternDao.getPattern(normalizedName)
+        
+        if (existing != null) {
+            // Update existing pattern with increased usage count and latest preferences
+            itemPatternDao.update(
+                existing.copy(
+                    usageCount = existing.usageCount + 1,
+                    lastUsed = System.currentTimeMillis(),
+                    suggestedCategory = category,
+                    suggestedQuantity = quantity,
+                    suggestedUnit = unit
+                )
+            )
+        } else {
+            // Create new pattern
+            itemPatternDao.insert(
+                ItemPattern(
+                    itemName = normalizedName,
+                    suggestedCategory = category,
+                    suggestedQuantity = quantity,
+                    suggestedUnit = unit,
+                    usageCount = 1,
+                    lastUsed = System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    suspend fun suggestCategory(itemName: String): String? {
+        return suggestItemDetails(itemName)?.suggestedCategory
+    }
+
+    suspend fun suggestItemDetails(itemName: String): ItemPattern? {
+        val normalizedName = itemName.lowercase().trim()
+        
+        // First try exact match
+        itemPatternDao.getPattern(normalizedName)?.let { return it }
+        
+        // Try similar items (contains logic)
+        val similarPatterns = itemPatternDao.findSimilarPatterns(normalizedName)
+        return similarPatterns.firstOrNull()
+    }
+
+    suspend fun getSuggestedCategoryWithConfidence(itemName: String): Pair<String?, Int>? {
+        val normalizedName = itemName.lowercase().trim()
+        
+        // Exact match has highest confidence
+        itemPatternDao.getPattern(normalizedName)?.let { 
+            return Pair(it.suggestedCategory, it.usageCount)
+        }
+        
+        // Partial matches have lower confidence based on usage count
+        val similarPatterns = itemPatternDao.findSimilarPatterns(normalizedName)
+        val bestMatch = similarPatterns.maxByOrNull { it.usageCount }
+        
+        return bestMatch?.let { Pair(it.suggestedCategory, it.usageCount) }
+    }
+
+    suspend fun getSuggestedItemDetailsWithConfidence(itemName: String): Pair<ItemPattern?, Int>? {
+        val normalizedName = itemName.lowercase().trim()
+        
+        // Exact match has highest confidence
+        itemPatternDao.getPattern(normalizedName)?.let { 
+            return Pair(it, it.usageCount)
+        }
+        
+        // Partial matches have lower confidence based on usage count
+        val similarPatterns = itemPatternDao.findSimilarPatterns(normalizedName)
+        val bestMatch = similarPatterns.maxByOrNull { it.usageCount }
+        
+        return bestMatch?.let { Pair(it, it.usageCount) }
+    }
+
+    // Seed patterns from templates for immediate smart suggestions
+    suspend fun seedPatternsFromTemplates() {
+        // Only seed if no patterns exist yet (first launch)
+        val existingPatterns = itemPatternDao.getAllPatterns()
+        if (existingPatterns.isNotEmpty()) return
+
+        // Get all templates and seed patterns from their items
+        val templates = templateDao.getAllTemplates().first() // Get current value from Flow
+        templates.forEach { template ->
+            template.items.forEach { templateItem ->
+                // Seed with usage count 1 so user patterns can override
+                itemPatternDao.insert(
+                    ItemPattern(
+                        itemName = templateItem.name.lowercase().trim(),
+                        suggestedCategory = templateItem.category,
+                        suggestedQuantity = templateItem.quantity,
+                        suggestedUnit = templateItem.unit,
+                        usageCount = 1, // Template seeds start with count 1
+                        lastUsed = System.currentTimeMillis()
+                    )
+                )
+            }
+        }
     }
 }

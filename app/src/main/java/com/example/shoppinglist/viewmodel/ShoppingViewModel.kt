@@ -2,6 +2,7 @@ package com.example.shoppinglist.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shoppinglist.data.database.entities.ItemPattern
 import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
@@ -80,5 +81,26 @@ class ShoppingViewModel(private val repository: ShoppingRepository) : ViewModel(
 
     suspend fun getTemplateById(id: String): ListTemplate? {
         return repository.getTemplateById(id)
+    }
+
+    // Smart learning functions
+    suspend fun suggestCategory(itemName: String): String? {
+        return repository.suggestCategory(itemName)
+    }
+
+    suspend fun suggestItemDetails(itemName: String): ItemPattern? {
+        return repository.suggestItemDetails(itemName)
+    }
+
+    suspend fun getSuggestedCategoryWithConfidence(itemName: String): Pair<String?, Int>? {
+        return repository.getSuggestedCategoryWithConfidence(itemName)
+    }
+
+    suspend fun getSuggestedItemDetailsWithConfidence(itemName: String): Pair<ItemPattern?, Int>? {
+        return repository.getSuggestedItemDetailsWithConfidence(itemName)
+    }
+
+    suspend fun seedPatternsFromTemplates() {
+        repository.seedPatternsFromTemplates()
     }
 }

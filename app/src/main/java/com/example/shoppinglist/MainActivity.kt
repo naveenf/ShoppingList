@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
     }
     
     private val repository by lazy {
-        ShoppingRepository(database.itemDao(), database.predefinedItemDao(), database.templateDao(), premiumManager)
+        ShoppingRepository(database.itemDao(), database.predefinedItemDao(), database.templateDao(), database.itemPatternDao(), premiumManager)
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +68,9 @@ class MainActivity : ComponentActivity() {
                     try {
                         DatabaseInitializer.populatePredefinedItems(database.predefinedItemDao())
                         DatabaseInitializer.populateTemplates(database.templateDao())
+                        
+                        // Seed smart learning patterns from templates (first launch only)
+                        viewModel.seedPatternsFromTemplates()
                         
                         // Create default list if no lists exist
                         if (shoppingLists.isEmpty()) {

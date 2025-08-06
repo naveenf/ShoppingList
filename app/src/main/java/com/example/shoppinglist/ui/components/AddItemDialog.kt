@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.shoppinglist.data.database.entities.ItemPattern
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 
@@ -30,6 +31,7 @@ fun AddItemDialog(
     predefinedItems: List<PredefinedItem> = emptyList(),
     onAddCustomItem: (String, String) -> Unit = { _, _ -> },
     onDeleteCustomItem: (PredefinedItem) -> Unit = { _ -> },
+    onSuggestItemDetails: (String) -> ItemPattern? = { null },
     modifier: Modifier = Modifier
 ) {
     var itemName by remember { mutableStateOf("") }
@@ -48,7 +50,7 @@ fun AddItemDialog(
         "Pantry", "Frozen", "Personal Care", "Household", "Beverages"
     )
     
-    val units = listOf("nos", "pack", "kg", "gm", "liters", "ml", "lbs", "oz", "cups")
+    val units = listOf("nos", "pcs", "pack", "kg", "gm", "liters", "ml", "lbs", "oz", "cups", "container", "containers", "bulb", "head", "bunch", "bottle", "jar", "bag", "box", "cartons", "loaves")
 
     val filteredItems = remember(itemName, predefinedItems) {
         if (itemName.length < 2) emptyList()
@@ -67,6 +69,28 @@ fun AddItemDialog(
             itemName = item.name
             category = item.category
             unit = item.defaultUnit
+        }
+    }
+
+    // Smart item details suggestion based on item name
+    LaunchedEffect(itemName) {
+        if (itemName.isNotBlank() && itemName.length >= 2 && selectedPredefinedItem == null) {
+            val suggestedDetails = onSuggestItemDetails(itemName)
+            if (suggestedDetails != null) {
+                if (suggestedDetails.suggestedCategory != category) {
+                    category = suggestedDetails.suggestedCategory
+                }
+                if (quantity == "1" || quantity.toFloatOrNull() == 1f) { // Only update if default
+                    quantity = if (suggestedDetails.suggestedQuantity % 1 == 0f) {
+                        suggestedDetails.suggestedQuantity.toInt().toString()
+                    } else {
+                        suggestedDetails.suggestedQuantity.toString()
+                    }
+                }
+                if (unit == "nos") { // Only update if default
+                    unit = suggestedDetails.suggestedUnit
+                }
+            }
         }
     }
 

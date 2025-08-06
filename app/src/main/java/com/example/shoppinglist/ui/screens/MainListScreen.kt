@@ -22,6 +22,7 @@ import com.example.shoppinglist.ui.components.EmptyState
 import com.example.shoppinglist.ui.components.ShoppingItemCard
 import com.example.shoppinglist.utils.ShareUtils
 import com.example.shoppinglist.viewmodel.ShoppingViewModel
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,6 +180,9 @@ fun MainListScreen(
             },
             onDeleteCustomItem = { item ->
                 viewModel.deletePredefinedItem(item)
+            },
+            onSuggestItemDetails = { itemName ->
+                runBlocking { viewModel.suggestItemDetails(itemName) }
             }
         )
     }
