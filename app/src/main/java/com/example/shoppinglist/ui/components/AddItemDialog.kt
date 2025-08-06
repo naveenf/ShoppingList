@@ -48,7 +48,7 @@ fun AddItemDialog(
         "Pantry", "Frozen", "Personal Care", "Household", "Beverages"
     )
     
-    val units = listOf("nos", "kg", "gm", "liters", "ml", "lbs", "oz", "cups")
+    val units = listOf("nos", "pack", "kg", "gm", "liters", "ml", "lbs", "oz", "cups")
 
     val filteredItems = remember(itemName, predefinedItems) {
         if (itemName.length < 2) emptyList()

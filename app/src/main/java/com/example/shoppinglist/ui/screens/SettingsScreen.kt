@@ -113,15 +113,29 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                     
+                    if (!isPremium) {
+                        Text(
+                            text = "Premium themes (Dark Mode & Paper Notebook) available with premium subscription",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    
                     Column(
                         modifier = Modifier.selectableGroup(),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        val themes = listOf(
-                            AppTheme.MODERN_LIGHT to "Modern Light",
-                            AppTheme.MODERN_DARK to "Modern Dark", 
-                            AppTheme.PAPER to "Paper Notebook 📝"
-                        )
+                        val themes = if (isPremium) {
+                            listOf(
+                                AppTheme.MODERN_LIGHT to "Modern Light",
+                                AppTheme.MODERN_DARK to "Modern Dark ⭐", 
+                                AppTheme.PAPER to "Paper Notebook ⭐📝"
+                            )
+                        } else {
+                            listOf(
+                                AppTheme.MODERN_LIGHT to "Modern Light"
+                            )
+                        }
                         
                         themes.forEach { (theme, label) ->
                             Row(

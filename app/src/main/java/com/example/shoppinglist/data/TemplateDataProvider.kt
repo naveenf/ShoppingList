@@ -17,11 +17,11 @@ object TemplateDataProvider {
                 icon = "🛒",
                 items = listOf(
                     // Essential Dairy & Eggs (5 items) - Most common dairy items
-                    TemplateItem("Milk", 2f, "liters", "Dairy"),
-                    TemplateItem("Eggs", 12f, "pcs", "Dairy"),
-                    TemplateItem("Yogurt", 4f, "cups", "Dairy"),
-                    TemplateItem("Cheese", 1f, "pack", "Dairy"),
-                    TemplateItem("Butter", 1f, "pack", "Dairy"),
+                    TemplateItem("Milk", 2f, "liters", "Dairy & Eggs"),
+                    TemplateItem("Eggs", 12f, "pcs", "Dairy & Eggs"),
+                    TemplateItem("Yogurt", 4f, "cups", "Dairy & Eggs"),
+                    TemplateItem("Cheese", 1f, "pack", "Dairy & Eggs"),
+                    TemplateItem("Butter", 1f, "pack", "Dairy & Eggs"),
                     
                     // Essential Produce (8 items) - Most purchased fruits/vegetables
                     TemplateItem("Bananas", 6f, "pcs", "Produce"),
@@ -34,10 +34,10 @@ object TemplateDataProvider {
                     TemplateItem("Garlic", 1f, "bulb", "Produce"),
                     
                     // Essential Proteins (4 items) - Most common protein sources
-                    TemplateItem("Chicken breast", 1f, "kg", "Meat"),
-                    TemplateItem("Ground beef", 0.5f, "kg", "Meat"),
-                    TemplateItem("Salmon", 0.5f, "kg", "Meat"),
-                    TemplateItem("Deli meat", 0.3f, "kg", "Meat"),
+                    TemplateItem("Chicken breast", 1f, "kg", "Meat & Seafood"),
+                    TemplateItem("Ground beef", 0.5f, "kg", "Meat & Seafood"),
+                    TemplateItem("Salmon", 0.5f, "kg", "Meat & Seafood"),
+                    TemplateItem("Deli meat", 0.3f, "kg", "Meat & Seafood"),
                     
                     // Essential Carbs & Bread (4 items)
                     TemplateItem("Bread", 2f, "loaves", "Bakery"),
@@ -71,10 +71,10 @@ object TemplateDataProvider {
                 icon = "🔥",
                 items = listOf(
                     // Main BBQ Proteins (4 items) - Core BBQ meats
-                    TemplateItem("Burger patties", 2f, "kg", "Meat"),
-                    TemplateItem("Hot dogs", 20f, "pcs", "Meat"),
-                    TemplateItem("Chicken wings", 2f, "kg", "Meat"),
-                    TemplateItem("Ribs", 1.5f, "kg", "Meat"),
+                    TemplateItem("Burger patties", 2f, "kg", "Meat & Seafood"),
+                    TemplateItem("Hot dogs", 20f, "pcs", "Meat & Seafood"),
+                    TemplateItem("Chicken wings", 2f, "kg", "Meat & Seafood"),
+                    TemplateItem("Ribs", 1.5f, "kg", "Meat & Seafood"),
                     
                     // Bread & Buns (3 items)
                     TemplateItem("Hamburger buns", 16f, "pcs", "Bakery"),
@@ -82,7 +82,7 @@ object TemplateDataProvider {
                     TemplateItem("Garlic bread", 2f, "loaves", "Bakery"),
                     
                     // Essential Toppings (5 items) - Most wanted toppings
-                    TemplateItem("Cheese slices", 24f, "pcs", "Dairy"),
+                    TemplateItem("Cheese slices", 24f, "pcs", "Dairy & Eggs"),
                     TemplateItem("Lettuce", 2f, "heads", "Produce"),
                     TemplateItem("Tomatoes", 2f, "kg", "Produce"),
                     TemplateItem("Onions", 4f, "pcs", "Produce"),
@@ -116,7 +116,7 @@ object TemplateDataProvider {
                 icon = "🦃",
                 items = listOf(
                     // Main Course (2 items)
-                    TemplateItem("Whole turkey", 6f, "kg", "Meat"),
+                    TemplateItem("Whole turkey", 6f, "kg", "Meat & Seafood"),
                     TemplateItem("Turkey gravy mix", 2f, "packets", "Pantry"),
                     
                     // Essential Sides (6 items) - Most popular Thanksgiving sides
@@ -128,15 +128,15 @@ object TemplateDataProvider {
                     TemplateItem("Carrots", 1f, "kg", "Produce"),
                     
                     // Cooking Essentials (5 items)
-                    TemplateItem("Butter", 1f, "kg", "Dairy"),
-                    TemplateItem("Heavy cream", 2f, "liters", "Dairy"),
+                    TemplateItem("Butter", 1f, "kg", "Dairy & Eggs"),
+                    TemplateItem("Heavy cream", 2f, "liters", "Dairy & Eggs"),
                     TemplateItem("Chicken broth", 3f, "cartons", "Pantry"),
                     TemplateItem("Onions", 4f, "pcs", "Produce"),
                     TemplateItem("Celery", 2f, "bunches", "Produce"),
                     
                     // Dessert Essentials (4 items)
                     TemplateItem("Pumpkin pie", 2f, "pies", "Bakery"),
-                    TemplateItem("Whipped cream", 2f, "containers", "Dairy"),
+                    TemplateItem("Whipped cream", 2f, "containers", "Dairy & Eggs"),
                     TemplateItem("Dinner rolls", 12f, "pcs", "Bakery"),
                     TemplateItem("Apple cider", 2f, "bottles", "Pantry"),
                     
@@ -176,17 +176,17 @@ object TemplateDataProvider {
                 icon = "🥑",
                 items = listOf(
                     TemplateItem("Avocados", 6f, "pcs", "Produce"),
-                    TemplateItem("Salmon fillets", 0.5f, "kg", "Meat"),
-                    TemplateItem("Ground beef", 1f, "kg", "Meat"),
-                    TemplateItem("Eggs", 24f, "pcs", "Dairy"),
-                    TemplateItem("Cheese", 0.5f, "kg", "Dairy"),
+                    TemplateItem("Salmon fillets", 0.5f, "kg", "Meat & Seafood"),
+                    TemplateItem("Ground beef", 1f, "kg", "Meat & Seafood"),
+                    TemplateItem("Eggs", 24f, "pcs", "Dairy & Eggs"),
+                    TemplateItem("Cheese", 0.5f, "kg", "Dairy & Eggs"),
                     TemplateItem("Spinach", 1f, "bag", "Produce"),
                     TemplateItem("Broccoli", 1f, "head", "Produce"),
                     TemplateItem("Cauliflower", 1f, "head", "Produce"),
                     TemplateItem("Olive oil", 1f, "bottle", "Pantry"),
                     TemplateItem("Coconut oil", 1f, "jar", "Pantry"),
                     TemplateItem("Nuts (almonds)", 1f, "bag", "Pantry"),
-                    TemplateItem("Greek yogurt", 1f, "container", "Dairy")
+                    TemplateItem("Greek yogurt", 1f, "container", "Dairy & Eggs")
                 )
             ),
 
@@ -205,7 +205,7 @@ object TemplateDataProvider {
                     TemplateItem("Granola bars", 12f, "pcs", "Pantry"),
                     TemplateItem("Bottled water", 24f, "bottles", "Pantry"),
                     TemplateItem("Coffee", 1f, "bag", "Pantry"),
-                    TemplateItem("Hot dogs", 8f, "pcs", "Meat"),
+                    TemplateItem("Hot dogs", 8f, "pcs", "Meat & Seafood"),
                     TemplateItem("Marshmallows", 1f, "bag", "Pantry"),
                     TemplateItem("Graham crackers", 1f, "box", "Pantry"),
                     TemplateItem("Chocolate bars", 4f, "pcs", "Pantry"),
@@ -225,11 +225,11 @@ object TemplateDataProvider {
                 icon = "⚡",
                 items = listOf(
                     // Quick Proteins (5 items) - Fast cooking proteins
-                    TemplateItem("Chicken thighs", 1.5f, "kg", "Meat"),
-                    TemplateItem("Ground beef", 1f, "kg", "Meat"),
-                    TemplateItem("Salmon fillets", 0.5f, "kg", "Meat"),
-                    TemplateItem("Eggs", 18f, "pcs", "Dairy"),
-                    TemplateItem("Shrimp", 0.5f, "kg", "Meat"),
+                    TemplateItem("Chicken thighs", 1.5f, "kg", "Meat & Seafood"),
+                    TemplateItem("Ground beef", 1f, "kg", "Meat & Seafood"),
+                    TemplateItem("Salmon fillets", 0.5f, "kg", "Meat & Seafood"),
+                    TemplateItem("Eggs", 18f, "pcs", "Dairy & Eggs"),
+                    TemplateItem("Shrimp", 0.5f, "kg", "Meat & Seafood"),
                     
                     // Quick Carbs (4 items) - Fast cooking starches
                     TemplateItem("Pasta", 3f, "boxes", "Pantry"),
@@ -251,7 +251,7 @@ object TemplateDataProvider {
                     TemplateItem("Olive oil", 1f, "bottle", "Pantry"),
                     TemplateItem("Canned tomatoes", 4f, "cans", "Pantry"),
                     TemplateItem("Chicken broth", 2f, "cartons", "Pantry"),
-                    TemplateItem("Cheese", 2f, "bags", "Dairy"),
+                    TemplateItem("Cheese", 2f, "bags", "Dairy & Eggs"),
                     TemplateItem("Hot sauce", 1f, "bottle", "Pantry")
                 )
             )
