@@ -15,10 +15,11 @@ A modern, elegant Android shopping list application built with Jetpack Compose a
 - **Modern Light Theme**: Clean design with sophisticated Huemint color palette (forest green, mustard gold, dark navy, off-white)
 - **Modern Dark Theme**: Dark mode variant for low-light usage
 - **Paper Notebook Theme**: Unique handwritten journal aesthetic with aged paper background, dotted lines, and margin lines
+- **Botanic Garden Theme**: Fresh, organic design with botanical elements, leaf patterns, and garden-inspired colors
 
 ### Premium Tier System
 - **Free Tier**: Basic functionality with 1 smart template (Weekly Essentials)
-- **Premium Tier**: Unlimited lists + 6 advanced smart templates:
+- **Premium Tier**: Unlimited lists + premium themes + 6 advanced smart templates:
   - Quick Dinners Week (22 items for 7 easy meals)
   - BBQ Party for 10-15 people (22 items)
   - Thanksgiving Dinner for 8-10 people (20 items)

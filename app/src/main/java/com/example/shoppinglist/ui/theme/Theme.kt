@@ -9,7 +9,8 @@ import androidx.compose.runtime.Composable
 enum class AppTheme {
     MODERN_LIGHT,
     MODERN_DARK,
-    PAPER
+    PAPER,
+    BOTANIC
 }
 
 private val DarkColorScheme = darkColorScheme(
@@ -51,6 +52,19 @@ private val PaperColorScheme = lightColorScheme(
     tertiary = PaperTertiary
 )
 
+private val BotanicColorScheme = lightColorScheme(
+    primary = BotanicPrimary,
+    onPrimary = BotanicOnPrimary,
+    secondary = BotanicSecondary,
+    onSecondary = BotanicOnSecondary,
+    background = BotanicBackground,
+    onBackground = BotanicOnBackground,
+    surface = BotanicSurface,
+    onSurface = BotanicOnSurface,
+    error = BotanicError,
+    tertiary = BotanicTertiary
+)
+
 @Composable
 fun ShoppingListTheme(
     theme: AppTheme = AppTheme.MODERN_LIGHT,
@@ -61,21 +75,31 @@ fun ShoppingListTheme(
         AppTheme.MODERN_LIGHT -> LightColorScheme
         AppTheme.MODERN_DARK -> DarkColorScheme
         AppTheme.PAPER -> PaperColorScheme
+        AppTheme.BOTANIC -> BotanicColorScheme
     }
     
     val typography = when (theme) {
         AppTheme.PAPER -> PaperTypography
+        AppTheme.BOTANIC -> BotanicTypography
         else -> Typography
     }
 
-    val themedContent: @Composable () -> Unit = if (theme == AppTheme.PAPER) {
-        {
-            PaperBackground {
-                content()
+    val themedContent: @Composable () -> Unit = when (theme) {
+        AppTheme.PAPER -> {
+            {
+                PaperBackground {
+                    content()
+                }
             }
         }
-    } else {
-        content
+        AppTheme.BOTANIC -> {
+            {
+                BotanicBackground {
+                    content()
+                }
+            }
+        }
+        else -> content
     }
 
     MaterialTheme(

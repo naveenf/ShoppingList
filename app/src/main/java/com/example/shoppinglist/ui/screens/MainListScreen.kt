@@ -44,6 +44,7 @@ fun MainListScreen(
     val groupedItems = items.groupBy { it.category }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(listName) },

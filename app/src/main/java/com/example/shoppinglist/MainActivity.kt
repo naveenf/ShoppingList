@@ -82,12 +82,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 
-                // Auto-revert premium themes when premium status is lost
-                LaunchedEffect(isPremium, selectedTheme) {
-                    if (!isPremium && (selectedTheme == AppTheme.MODERN_DARK || selectedTheme == AppTheme.PAPER)) {
-                        themeManager.setTheme(AppTheme.MODERN_LIGHT)
-                    }
-                }
+                // Note: Premium theme reversion handled by SettingsScreen to avoid race conditions
                 
                 // Navigation logic
                 when {

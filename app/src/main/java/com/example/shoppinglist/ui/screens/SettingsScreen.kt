@@ -115,7 +115,7 @@ fun SettingsScreen(
                     
                     if (!isPremium) {
                         Text(
-                            text = "Premium themes (Dark Mode & Paper Notebook) available with premium subscription",
+                            text = "Premium themes (Dark Mode, Paper Notebook & Botanic Garden) available with premium subscription",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -129,7 +129,8 @@ fun SettingsScreen(
                             listOf(
                                 AppTheme.MODERN_LIGHT to "Modern Light",
                                 AppTheme.MODERN_DARK to "Modern Dark ⭐", 
-                                AppTheme.PAPER to "Paper Notebook ⭐📝"
+                                AppTheme.PAPER to "Paper Notebook ⭐📝",
+                                AppTheme.BOTANIC to "Botanic Garden ⭐🌿"
                             )
                         } else {
                             listOf(

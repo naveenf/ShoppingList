@@ -52,3 +52,51 @@ val PaperTypography = Typography(
         letterSpacing = 0.1.sp
     )
 )
+
+// Botanic Typography - Natural, organic feel with rounded fonts
+val BotanicTypography = Typography(
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily.Serif, // Changed to Serif for more distinct difference
+        fontWeight = FontWeight.Medium,
+        fontSize = 28.sp, // Increased size
+        letterSpacing = 1.2.sp // Much wider spacing for organic, airy feel
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 24.sp,
+        letterSpacing = 0.8.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp, // Increased
+        letterSpacing = 0.6.sp
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp, // Increased
+        letterSpacing = 0.5.sp, // More spacing for natural readability
+        lineHeight = 26.sp // More breathing room between lines
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp, // Increased
+        letterSpacing = 0.4.sp,
+        lineHeight = 24.sp
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 15.sp, // Increased
+        letterSpacing = 0.7.sp // More spacing for labels/buttons
+    ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.Serif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 13.sp, // Increased
+        letterSpacing = 0.6.sp
+    )
+)

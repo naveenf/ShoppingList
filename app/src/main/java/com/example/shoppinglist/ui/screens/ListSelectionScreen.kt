@@ -1,5 +1,6 @@
 package com.example.shoppinglist.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,7 +40,9 @@ fun ListSelectionScreen(
     var showDeleteDialog by remember { mutableStateOf<ShoppingList?>(null) }
     
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
             title = { Text("My Shopping Lists") },
@@ -47,7 +50,11 @@ fun ListSelectionScreen(
                 IconButton(onClick = onSettingsClick) {
                     Icon(Icons.Default.Settings, contentDescription = "Settings")
                 }
-            }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface
+            )
         )
         
         if (shoppingLists.isEmpty()) {
