@@ -75,13 +75,19 @@ Sophisticated Huemint 3-color palette creating premium shopping experience:
 - Off-white (#F4F0EF) - Background, cleanliness
 
 ## Key Differentiators
-1. **Multi-theme support** including unique Paper Notebook theme
+1. **Multi-theme support** including unique Paper Notebook theme and Botanic Garden theme with custom background images
 2. **Smart Templates** based on 80/20 rule for common shopping scenarios
 3. **Premium tier** with advanced features and unlimited lists
 4. **Sophisticated color palette** from Huemint for premium feel
 5. **Offline-first** design with local database storage
 6. **Material Design 3** implementation with modern UI patterns
 7. **Intelligent Store Learning** - AI-powered item suggestions that learn from user behavior and templates
+
+## Recent Updates
+- **Theme System Enhancement**: Added Botanic Garden premium theme with botanical background imagery and custom serif typography
+- **Background Rendering**: Implemented image-based botanical backgrounds replacing Canvas-drawn elements for better visual appeal
+- **Dark Theme Fix**: Resolved Modern Dark theme background color issues on both main list screen and list selection screen
+- **Theme Consistency**: Fixed theme selection persistence and prevented unwanted reverts to default themes
 
 ## Target SDK & Compatibility
 - Minimum SDK: 24 (Android 7.0)
