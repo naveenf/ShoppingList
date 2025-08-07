@@ -108,6 +108,7 @@ class MainActivity : ComponentActivity() {
                             viewModel = viewModel, 
                             listId = selectedList!!.id,
                             listName = selectedList!!.name,
+                            currentTheme = selectedTheme,
                             onBackToLists = { selectedList = null }
                         )
                     }

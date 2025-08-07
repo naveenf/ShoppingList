@@ -19,7 +19,10 @@ import com.example.shoppinglist.ui.components.AddItemDialog
 import com.example.shoppinglist.ui.components.CategoryHeader
 import com.example.shoppinglist.ui.components.EditItemDialog
 import com.example.shoppinglist.ui.components.EmptyState
+import com.example.shoppinglist.ui.components.PaperCategoryHeader
+import com.example.shoppinglist.ui.components.PaperShoppingItem
 import com.example.shoppinglist.ui.components.ShoppingItemCard
+import com.example.shoppinglist.ui.theme.AppTheme
 import com.example.shoppinglist.utils.ShareUtils
 import com.example.shoppinglist.viewmodel.ShoppingViewModel
 import kotlinx.coroutines.runBlocking
@@ -30,6 +33,7 @@ fun MainListScreen(
     viewModel: ShoppingViewModel,
     listId: String,
     listName: String,
+    currentTheme: AppTheme,
     onBackToLists: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -44,7 +48,11 @@ fun MainListScreen(
     val groupedItems = items.groupBy { it.category }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = if (currentTheme == AppTheme.PAPER || currentTheme == AppTheme.BOTANIC) {
+            androidx.compose.ui.graphics.Color.Transparent
+        } else {
+            MaterialTheme.colorScheme.background
+        },
         topBar = {
             TopAppBar(
                 title = { Text(listName) },
@@ -127,40 +135,77 @@ fun MainListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(1.dp)
+                contentPadding = if (currentTheme == AppTheme.PAPER) {
+                    PaddingValues(vertical = 40.dp) // Start at first line
+                } else {
+                    PaddingValues(vertical = 8.dp)
+                },
+                verticalArrangement = if (currentTheme == AppTheme.PAPER) {
+                    Arrangement.spacedBy(0.dp) // No extra spacing - items align exactly with lines
+                } else {
+                    Arrangement.spacedBy(1.dp)
+                }
             ) {
                 groupedItems.forEach { (category, categoryItems) ->
                     item(key = "header_$category") {
-                        CategoryHeader(
-                            categoryName = category,
-                            itemCount = categoryItems.size
-                        )
+                        if (currentTheme == AppTheme.PAPER) {
+                            PaperCategoryHeader(
+                                category = category,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            CategoryHeader(
+                                categoryName = category,
+                                itemCount = categoryItems.size,
+                                useSemiTransparentBackground = currentTheme == AppTheme.BOTANIC
+                            )
+                        }
                     }
                     
                     items(
                         items = categoryItems,
                         key = { it.id }
                     ) { item ->
-                        ShoppingItemCard(
-                            item = item,
-                            onCheckedChange = { checked ->
-                                viewModel.update(item.copy(isChecked = checked))
-                            },
-                            onDelete = {
-                                viewModel.delete(item)
-                            },
-                            onEdit = {
-                                editingItem = item
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 2.dp)
-                        )
+                        if (currentTheme == AppTheme.PAPER) {
+                            PaperShoppingItem(
+                                item = item,
+                                onItemClick = {
+                                    editingItem = item
+                                },
+                                onCheckedChange = { checked ->
+                                    viewModel.update(item.copy(isChecked = checked))
+                                },
+                                onDelete = {
+                                    viewModel.delete(item)
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            ShoppingItemCard(
+                                item = item,
+                                onCheckedChange = { checked ->
+                                    viewModel.update(item.copy(isChecked = checked))
+                                },
+                                onDelete = {
+                                    viewModel.delete(item)
+                                },
+                                onEdit = {
+                                    editingItem = item
+                                },
+                                useSemiTransparentBackground = currentTheme == AppTheme.BOTANIC,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 2.dp)
+                            )
+                        }
                     }
                     
                     item(key = "spacer_$category") {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        if (currentTheme == AppTheme.PAPER) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                        } else {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }

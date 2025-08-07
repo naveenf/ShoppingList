@@ -6,6 +6,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+// Enhanced handwriting font family using system cursive with better styling
+val HandwritingFontFamily = FontFamily.Cursive
+
 // Modern Typography (Default)
 val Typography = Typography(
     headlineMedium = TextStyle(
@@ -25,31 +28,64 @@ val Typography = Typography(
     )
 )
 
-// Paper/Handwritten Typography - Using Cursive font
+// Paper/Handwritten Typography - Enhanced handwriting style
 val PaperTypography = Typography(
     headlineMedium = TextStyle(
-        fontFamily = FontFamily.Cursive,
+        fontFamily = HandwritingFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 26.sp,
-        letterSpacing = 0.5.sp
+        fontSize = 24.sp,
+        letterSpacing = 1.2.sp // Wider spacing for handwriting
+    ),
+    titleLarge = TextStyle(
+        fontFamily = HandwritingFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22.sp,
+        letterSpacing = 1.0.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = HandwritingFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        letterSpacing = 0.8.sp
     ),
     bodyLarge = TextStyle(
-        fontFamily = FontFamily.Cursive,
-        fontWeight = FontWeight.Normal,
-        fontSize = 18.sp,
-        letterSpacing = 0.3.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily.Cursive,
+        fontFamily = HandwritingFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        letterSpacing = 0.2.sp
+        letterSpacing = 0.6.sp,
+        lineHeight = 22.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = HandwritingFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 15.sp,
+        letterSpacing = 0.5.sp,
+        lineHeight = 20.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = HandwritingFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 13.sp,
+        letterSpacing = 0.4.sp,
+        lineHeight = 18.sp
     ),
     labelLarge = TextStyle(
-        fontFamily = FontFamily.Cursive,
+        fontFamily = HandwritingFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        letterSpacing = 0.1.sp
+        letterSpacing = 0.8.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = HandwritingFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        letterSpacing = 0.6.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = HandwritingFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        letterSpacing = 0.5.sp
     )
 )
 

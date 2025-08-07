@@ -21,12 +21,17 @@ fun ShoppingItemCard(
     onCheckedChange: (Boolean) -> Unit,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
+    useSemiTransparentBackground: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = if (useSemiTransparentBackground) {
+                MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(12.dp)

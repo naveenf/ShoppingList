@@ -42,7 +42,6 @@ fun ListSelectionScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
             title = { Text("My Shopping Lists") },

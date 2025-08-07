@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 fun CategoryHeader(
     categoryName: String,
     itemCount: Int,
+    useSemiTransparentBackground: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val categoryIcon = when (categoryName.lowercase()) {
@@ -31,7 +32,11 @@ fun CategoryHeader(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                if (useSemiTransparentBackground) {
+                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.05f)
+                } else {
+                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                }
             )
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
