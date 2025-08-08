@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.shoppinglist.data.database.entities.ShoppingItem
+import com.example.shoppinglist.utils.TextUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +115,7 @@ fun EditItemDialog(
             TextButton(
                 onClick = {
                     val updatedItem = item.copy(
-                        name = itemName.trim(),
+                        name = TextUtils.formatItemName(itemName.trim()),
                         quantity = quantity.toFloatOrNull() ?: 1f,
                         unit = unit.trim().ifEmpty { "nos" },
                         category = category.trim(),

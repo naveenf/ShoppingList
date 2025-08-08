@@ -28,6 +28,7 @@ import com.example.shoppinglist.data.database.entities.ShoppingItem
 import com.example.shoppinglist.utils.VoiceRecognitionManager
 import com.example.shoppinglist.utils.VoiceInputParser
 import com.example.shoppinglist.utils.VoiceInputState
+import com.example.shoppinglist.utils.TextUtils
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -77,7 +78,7 @@ fun AddItemDialog(
             if (result.success) {
                 val parsedInputs = VoiceInputParser.parseVoiceInput(result.text)
                 parsedInputs.firstOrNull()?.let { parsed ->
-                    itemName = parsed.itemName
+                    itemName = parsed.itemName // Already formatted in title case by VoiceInputParser
                     quantity = if (parsed.quantity % 1 == 0f) {
                         parsed.quantity.toInt().toString()
                     } else {
@@ -401,13 +402,15 @@ fun AddItemDialog(
                     Button(
                         onClick = {
                             if (itemName.isNotBlank()) {
+                                val formattedItemName = TextUtils.formatItemName(itemName.trim())
+                                
                                 if (showCustomForm) {
-                                    onAddCustomItem(itemName.trim(), category)
+                                    onAddCustomItem(formattedItemName, category)
                                 }
                                 
                                 val item = ShoppingItem(
                                     listId = listId,
-                                    name = itemName.trim(),
+                                    name = formattedItemName,
                                     quantity = quantity.toFloatOrNull() ?: 1f,
                                     unit = unit,
                                     category = category,

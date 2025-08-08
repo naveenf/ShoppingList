@@ -117,7 +117,7 @@ object VoiceInputParser {
         if (itemName.isBlank()) return null
         
         return ParsedVoiceInput(
-            itemName = itemName,
+            itemName = TextUtils.formatItemName(itemName),
             quantity = quantity,
             unit = unit
         )
