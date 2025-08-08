@@ -1,5 +1,8 @@
 package com.example.shoppinglist.ui.components
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -15,12 +18,16 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.shoppinglist.data.database.entities.ItemPattern
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
+import com.example.shoppinglist.utils.VoiceRecognitionManager
+import com.example.shoppinglist.utils.VoiceInputParser
+import com.example.shoppinglist.utils.VoiceInputState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -34,6 +41,8 @@ fun AddItemDialog(
     onSuggestItemDetails: (String) -> ItemPattern? = { null },
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    
     var itemName by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("1") }
     var unit by remember { mutableStateOf("nos") }
@@ -44,6 +53,74 @@ fun AddItemDialog(
     var showCustomForm by remember { mutableStateOf(false) }
     var selectedPredefinedItem by remember { mutableStateOf<PredefinedItem?>(null) }
     var itemToDelete by remember { mutableStateOf<PredefinedItem?>(null) }
+    
+    // Voice input state management
+    var voiceRecognitionManager by remember { mutableStateOf<VoiceRecognitionManager?>(null) }
+    var voiceInputState by remember { mutableStateOf(VoiceInputState.IDLE) }
+    var hasAudioPermission by remember { mutableStateOf(false) }
+    
+    // Initialize voice recognition manager
+    LaunchedEffect(context) {
+        voiceRecognitionManager = VoiceRecognitionManager(context)
+    }
+    
+    // Observe voice input state
+    LaunchedEffect(voiceRecognitionManager) {
+        voiceRecognitionManager?.voiceInputState?.collect { state ->
+            voiceInputState = state
+        }
+    }
+    
+    // Voice input functions
+    val startVoiceInput: () -> Unit = {
+        voiceRecognitionManager?.startListening { result ->
+            if (result.success) {
+                val parsedInputs = VoiceInputParser.parseVoiceInput(result.text)
+                parsedInputs.firstOrNull()?.let { parsed ->
+                    itemName = parsed.itemName
+                    quantity = if (parsed.quantity % 1 == 0f) {
+                        parsed.quantity.toInt().toString()
+                    } else {
+                        parsed.quantity.toString()
+                    }
+                    unit = parsed.unit
+                    selectedPredefinedItem = null
+                }
+            }
+        }
+        Unit
+    }
+    
+    val stopVoiceInput: () -> Unit = {
+        voiceRecognitionManager?.stopListening()
+        Unit
+    }
+    
+    // Permission launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasAudioPermission = isGranted
+        if (isGranted) {
+            startVoiceInput()
+        }
+    }
+    
+    val handleVoiceButtonClick: () -> Unit = {
+        if (hasAudioPermission) {
+            startVoiceInput()
+        } else {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+        Unit
+    }
+    
+    // Cleanup voice recognition manager
+    DisposableEffect(Unit) {
+        onDispose {
+            voiceRecognitionManager?.destroy()
+        }
+    }
 
     val categories = listOf(
         "Produce", "Dairy & Eggs", "Bakery", "Meat & Seafood", 
@@ -115,17 +192,30 @@ fun AddItemDialog(
                 )
 
                 if (!showCustomForm) {
-                    OutlinedTextField(
-                        value = itemName,
-                        onValueChange = { 
-                            itemName = it
-                            selectedPredefinedItem = null
-                        },
-                        label = { Text("Search items...") },
-                        placeholder = { Text("e.g., milk, cheese, bread") },
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = itemName,
+                            onValueChange = { 
+                                itemName = it
+                                selectedPredefinedItem = null
+                            },
+                            label = { Text("Search items...") },
+                            placeholder = { Text("e.g., milk, cheese, bread") },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true
+                        )
+                        
+                        VoiceInputButton(
+                            voiceInputState = voiceInputState,
+                            onStartListening = handleVoiceButtonClick,
+                            onStopListening = stopVoiceInput,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
 
                     if (itemName.length >= 2) {
                         Card(
