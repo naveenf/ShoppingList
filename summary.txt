@@ -7,9 +7,11 @@ A modern, elegant Android shopping list application built with Jetpack Compose a
 
 ### Item Management
 - Add items via floating action button with auto-complete suggestions
+- **Voice Input**: Microphone button for hands-free item addition with smart parsing
 - Edit items with quantity, units, categories, and notes
 - Delete items with swipe gesture and undo functionality
 - Check/uncheck items with visual feedback (strikethrough, fade)
+- **Automatic Title Case**: All item names formatted in proper title case ("apple" → "Apple")
 
 ### Multi-Theme System
 - **Modern Light Theme**: Clean design with sophisticated Huemint color palette (forest green, mustard gold, dark navy, off-white)
@@ -82,8 +84,13 @@ Sophisticated Huemint 3-color palette creating premium shopping experience:
 5. **Offline-first** design with local database storage
 6. **Material Design 3** implementation with modern UI patterns
 7. **Intelligent Store Learning** - AI-powered item suggestions that learn from user behavior and templates
+8. **Voice Input Integration** - Natural speech recognition with smart parsing of quantities and units
+9. **Automatic Text Formatting** - Title case transformation for consistent item naming
 
 ## Recent Updates
+- **Voice Input Feature**: Added comprehensive voice recognition system with microphone button, permission handling, and smart parsing of spoken commands like "2 liters of milk"
+- **Title Case Formatting**: Implemented automatic title case transformation for all item names across manual input, voice input, and editing ("organic coconut oil" → "Organic Coconut Oil")
+- **Smart Voice Parsing**: Advanced natural language processing that extracts item names, quantities, and units from voice commands
 - **Theme System Enhancement**: Added Botanic Garden premium theme with botanical background imagery and custom serif typography
 - **Background Rendering**: Implemented image-based botanical backgrounds replacing Canvas-drawn elements for better visual appeal
 - **Dark Theme Fix**: Resolved Modern Dark theme background color issues on both main list screen and list selection screen
