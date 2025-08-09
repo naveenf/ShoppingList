@@ -503,4 +503,17 @@ The Huemint 3-color palette creates a premium, trustworthy shopping experience:
 
 This color combination stands out from typical shopping apps while maintaining professionalism and accessibility.
 
+## Development Guidelines & Reminders
+
+### Git Commit Protocol
+- **ALWAYS update summary.txt** when committing significant features or changes
+- Keep commits focused and descriptive
+- Follow conventional commit format when possible
+- Update CLAUDE.md project requirements if architecture changes
+
+### Current Implementation Status
+- **Family Sync Phase 1**: ✅ *Completed* - Offline-first foundation with anonymous codes, dual FABs, family dialogs
+- **Family Sync Phase 2**: 🚧 *Pending* - Firebase real-time synchronization, conflict resolution
+- **Advanced Features**: 🚧 *Pending* - Price tracking, barcode scanning, widgets
+
 Remember: The goal is to create an app that users will love to use daily. Focus on speed, simplicity, and delight in every interaction.
