@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
+import com.example.shoppinglist.ui.components.JoinFamilyDialog
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.ShoppingList
+import com.example.shoppinglist.ui.components.FamilySharingDialog
+import com.example.shoppinglist.utils.DeviceUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,15 +37,58 @@ fun ListSelectionScreen(
     onDeleteList: (ShoppingList) -> Unit,
     onUpgradeToPremium: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
+    onJoinFamilyList: (String, String) -> Unit = { _, _ -> },
+    onShareList: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf<ShoppingList?>(null) }
+    var showJoinFamilyDialog by remember { mutableStateOf(false) }
+    var joinFamilyError by remember { mutableStateOf<String?>(null) }
+    var isJoiningFamily by remember { mutableStateOf(false) }
+    var showFamilySharingDialog by remember { mutableStateOf(false) }
+    var familyShareCode by remember { mutableStateOf<String?>(null) }
+    var sharingList by remember { mutableStateOf<ShoppingList?>(null) }
     
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            // Dual FABs for creating and joining lists
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Join Family List FAB
+                FloatingActionButton(
+                    onClick = { 
+                        println("Join Family FAB clicked!")
+                        showJoinFamilyDialog = true 
+                    },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ) {
+                    Text(
+                        text = "👥",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+                
+                // Create New List FAB (Primary)
+                FloatingActionButton(
+                    onClick = { 
+                        println("Create New FAB clicked!")
+                        showCreateDialog = true 
+                    }
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Create new list")
+                }
+            }
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
         TopAppBar(
             title = { Text("My Shopping Lists") },
             actions = {
@@ -66,21 +112,49 @@ fun ListSelectionScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = "No shopping lists yet",
+                        text = "🛒 Welcome to Shopping Lists!",
                         style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Create your first shopping list to get started",
+                        text = "Create your own list or join a family member's list using their share code",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Button(
-                        onClick = { showCreateDialog = true }
+                    
+                    // Action hint
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        )
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Create List")
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "👥",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(
+                                text = "Join Family",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            
+                            Spacer(modifier = Modifier.width(8.dp))
+                            
+                            Text(
+                                text = "➕",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(
+                                text = "Create New",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
@@ -96,22 +170,20 @@ fun ListSelectionScreen(
                         itemCount = itemCounts[list.id] ?: 0,
                         checkedCount = checkedCounts[list.id] ?: 0,
                         onClick = { onListSelected(list) },
-                        onDeleteClick = { showDeleteDialog = list }
+                        onDeleteClick = { showDeleteDialog = list },
+                        onShareClick = { 
+                            familyShareCode = DeviceUtils.generateFamilyShareCode()
+                            sharingList = list
+                            showFamilySharingDialog = true 
+                        }
                     )
                 }
             }
         }
-        
-        FloatingActionButton(
-            onClick = { showCreateDialog = true },
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(16.dp)
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Create new list")
-        }
     }
+    } // Close Scaffold content block
     
+    // All dialogs should be outside the Scaffold
     if (showCreateDialog) {
         CreateListDialog(
             templates = templates,
@@ -151,6 +223,47 @@ fun ListSelectionScreen(
             }
         )
     }
+    
+    // Join Family Dialog
+    if (showJoinFamilyDialog) {
+        JoinFamilyDialog(
+            onDismiss = { 
+                showJoinFamilyDialog = false
+                joinFamilyError = null
+                isJoiningFamily = false
+            },
+            onJoinFamily = { familyCode ->
+                isJoiningFamily = true
+                joinFamilyError = null
+                
+                // Phase 1: Create a local family list with the share code
+                val listName = "Family List ($familyCode)"
+                onJoinFamilyList(familyCode, listName)
+                
+                isJoiningFamily = false
+                showJoinFamilyDialog = false
+            },
+            isLoading = isJoiningFamily,
+            errorMessage = joinFamilyError
+        )
+    }
+    
+    // Family Sharing Dialog
+    if (showFamilySharingDialog && familyShareCode != null) {
+        FamilySharingDialog(
+            shareCode = familyShareCode!!,
+            onDismiss = { 
+                showFamilySharingDialog = false
+                familyShareCode = null
+                sharingList = null
+            },
+            onShareCode = { code ->
+                sharingList?.let { list ->
+                    onShareList(code)
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -159,7 +272,8 @@ private fun ShoppingListCard(
     itemCount: Int,
     checkedCount: Int,
     onClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onShareClick: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
@@ -208,6 +322,13 @@ private fun ShoppingListCard(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
+                    DropdownMenuItem(
+                        text = { Text("👥 Share with Family") },
+                        onClick = {
+                            showMenu = false
+                            onShareClick()
+                        }
+                    )
                     DropdownMenuItem(
                         text = { Text("Delete") },
                         onClick = {

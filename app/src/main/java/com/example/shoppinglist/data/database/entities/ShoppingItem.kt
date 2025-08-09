@@ -15,5 +15,10 @@ data class ShoppingItem(
     val isChecked: Boolean = false,
     val notes: String? = null,
     val addedDate: Long = System.currentTimeMillis(),
-    val lastModified: Long = System.currentTimeMillis()
+    val lastModified: Long = System.currentTimeMillis(),
+    
+    // Family sync fields
+    val deviceId: String = "", // Will be populated by repository
+    val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY,
+    val familyCode: String? = null
 )

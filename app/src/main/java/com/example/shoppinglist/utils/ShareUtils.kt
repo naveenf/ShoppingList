@@ -6,6 +6,17 @@ import com.example.shoppinglist.data.database.entities.ShoppingItem
 
 object ShareUtils {
     
+    fun shareText(context: Context, text: String) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        
+        val chooserIntent = Intent.createChooser(shareIntent, "Share")
+        context.startActivity(chooserIntent)
+    }
+    
     fun shareShoppingList(
         context: Context, 
         listName: String, 

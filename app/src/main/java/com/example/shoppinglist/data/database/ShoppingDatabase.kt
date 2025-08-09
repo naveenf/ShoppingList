@@ -10,11 +10,12 @@ import com.example.shoppinglist.data.database.entities.ListTemplate
 import com.example.shoppinglist.data.database.entities.PredefinedItem
 import com.example.shoppinglist.data.database.entities.ShoppingItem
 import com.example.shoppinglist.data.database.entities.ShoppingList
+import com.example.shoppinglist.data.database.entities.FamilyListLocal
 import kotlinx.coroutines.CoroutineScope
 
 @Database(
-    entities = [ShoppingItem::class, ShoppingList::class, PredefinedItem::class, ListTemplate::class, ItemPattern::class], 
-    version = 6, 
+    entities = [ShoppingItem::class, ShoppingList::class, PredefinedItem::class, ListTemplate::class, ItemPattern::class, FamilyListLocal::class], 
+    version = 7, 
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -23,6 +24,7 @@ abstract class ShoppingDatabase : RoomDatabase() {
     abstract fun predefinedItemDao(): PredefinedItemDao
     abstract fun templateDao(): TemplateDao
     abstract fun itemPatternDao(): ItemPatternDao
+    abstract fun familyListDao(): FamilyListDao
 
     companion object {
         @Volatile
@@ -33,7 +35,7 @@ abstract class ShoppingDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     ShoppingDatabase::class.java,
-                    "shopping_database_v6"
+                    "shopping_database_v7"
                 )
                 .fallbackToDestructiveMigration()
                 .build()

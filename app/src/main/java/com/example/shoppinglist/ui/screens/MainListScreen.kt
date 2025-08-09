@@ -19,11 +19,13 @@ import com.example.shoppinglist.ui.components.AddItemDialog
 import com.example.shoppinglist.ui.components.CategoryHeader
 import com.example.shoppinglist.ui.components.EditItemDialog
 import com.example.shoppinglist.ui.components.EmptyState
+import com.example.shoppinglist.ui.components.FamilySharingDialog
 import com.example.shoppinglist.ui.components.PaperCategoryHeader
 import com.example.shoppinglist.ui.components.PaperShoppingItem
 import com.example.shoppinglist.ui.components.ShoppingItemCard
 import com.example.shoppinglist.ui.theme.AppTheme
 import com.example.shoppinglist.utils.ShareUtils
+import com.example.shoppinglist.utils.DeviceUtils
 import com.example.shoppinglist.viewmodel.ShoppingViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -43,6 +45,15 @@ fun MainListScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var showShareMenu by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<ShoppingItem?>(null) }
+    
+    // Family sharing state
+    var showFamilySharingDialog by remember { mutableStateOf(false) }
+    var familyShareCode by remember { mutableStateOf<String?>(null) }
+    
+    // Check if this list is already a family list
+    val isFamilyList by remember { 
+        mutableStateOf(false) // This will be connected to viewModel in Phase 2
+    }
 
     // Group items by category
     val groupedItems = items.groupBy { it.category }
@@ -77,6 +88,20 @@ fun MainListScreen(
                                 expanded = showShareMenu,
                                 onDismissRequest = { showShareMenu = false }
                             ) {
+                                // Family sharing option
+                                if (!isFamilyList) {
+                                    DropdownMenuItem(
+                                        text = { Text("👥 Share with Family") },
+                                        onClick = {
+                                            // Generate family share code and show dialog
+                                            familyShareCode = DeviceUtils.generateFamilyShareCode()
+                                            showFamilySharingDialog = true
+                                            showShareMenu = false
+                                        }
+                                    )
+                                    HorizontalDivider()
+                                }
+                                
                                 DropdownMenuItem(
                                     text = { Text("Share List") },
                                     leadingIcon = {
@@ -240,6 +265,20 @@ fun MainListScreen(
             onSave = { updatedItem ->
                 viewModel.update(updatedItem)
                 editingItem = null
+            }
+        )
+    }
+    
+    // Family sharing dialog
+    if (showFamilySharingDialog && familyShareCode != null) {
+        FamilySharingDialog(
+            shareCode = familyShareCode!!,
+            onDismiss = { 
+                showFamilySharingDialog = false
+                familyShareCode = null
+            },
+            onShareCode = { code ->
+                ShareUtils.shareText(context, "Join our family shopping list! Use code: $code")
             }
         )
     }

@@ -138,7 +138,16 @@ class MainActivity : ComponentActivity() {
                                 premiumManager.setPremiumStatus(true)
                             }
                         },
-                        onSettingsClick = { showSettings = true }
+                        onSettingsClick = { showSettings = true },
+                        onJoinFamilyList = { familyCode, listName ->
+                            // Phase 1: Create a local family list
+                            val newList = ShoppingList(name = listName)
+                            viewModel.insertList(newList)
+                            selectedList = newList
+                        },
+                        onShareList = { shareCode ->
+                            // TODO: Handle sharing functionality
+                        }
                     )
                     }
                 }
